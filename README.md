@@ -1,35 +1,40 @@
-# GN1B
+# GNB
 
-[GraspNet Baseline](https://github.com/graspnet/graspnet-baseline)的ROS包装。WIP
+代码来自[GraspNet Baseline](https://github.com/graspnet/graspnet-baseline)。
 
 ## 安装环境
 
-使用conda-forge为默认频道。全部安装求解环境比较慢，可以分两次。API中使用了transforms3d==0.3.1需要numpy=1.19，但也可以手动将其中的`np.float`改为`np.float32`。tqdm后为api所需；open3d需使用pip安装，版本只要求>=0.8。pip可能需要降级google-auth。
+knn使用的THC.h在pytorch 1.11中删除。open3d需使用pip安装，版本只要求>=0.8。
 
-    conda create -c conda-forge -n gn1b pytorch=1.10.2=cuda111py39h930882a_1 tensorboard=2.3 numpy scipy pillow tqdm opencv matplotlib trimesh scikit-image cvxopt h5py scikit-learn
-    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple open3d==0.14.1
+    conda create -c conda-forge -n gnb pytorch=1.10.2=cuda111py39h930882a_1 tensorboard=2.3 numpy scipy rospkg
+    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple open3d==0.14.1 google-auth==1.35.0 grasp-nms
 
-编译并安装 pointnet2 运算符：
+编译并安装 pointnet2 算子：
 
     cd pointnet2
     python setup.py install
 
-编译并安装 knn operator:
+编译并安装 knn 算子:
 
     cd knn
     python setup.py install
 
-安装API:setup.py中sklearn改为scikit-learn，然后：
+## 下载模型
 
-    cd graspnetAPI
-    pip install .
+从[Google Drive](https://drive.google.com/file/d/1hd0G8LN6tRpi4742XOTEisbTXNZ-1jmk/view?usp=sharing)下载checkpoint-rs.tar，放入model文件夹。
 
-将dataset/graspnet_dataset.py第12行`from torch._six import container_abcs`修改为`import collections.abc as container_abcs`
+## 运行
 
-运行demo：command_demo.sh开头添加虚拟环境库地址，如：
+    roslaunch gnb node.launch
 
-    LD_LIBRARY_PATH=/home/<user-name>/miniconda/envs/gn1b/lib
+## 使用
 
-然后运行：
+向点云话题发布相机坐标系中的点云，预测出的n个同坐标系下的抓取会被发布到抓取话题，质量降序排列；同时其可视化Marker会被发布到marker话题。在node.launch中修改这三两个话题名。
 
-    sh command_demo.sh
+使用场景点云预测时方向似乎不对，发布单独的物体点云效果好一些。
+
+## 待调整参数
+
+关于夹爪与碰撞检测的参数 https://github.com/graspnet/graspnet-baseline/issues/23#issuecomment-899084543
+后处理 https://github.com/graspnet/graspnet-baseline/issues/18#issuecomment-873758326
+点云中心化 https://github.com/graspnet/graspnet-baseline/issues/15#issuecomment-803748788

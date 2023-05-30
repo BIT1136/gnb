@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="gnb" type="gnb_server.py" name="gnb_server" cwd="node" output="screen">
+    <param name="pointcloud_topic" value="pointcloud"/>
+    <!-- <param name="pointcloud_topic" value="object_pointcloud"/> -->
+    <param name="grasp_topic" value="grasps"/>
+    <param name="marker_topic" value="marker"/>
+  </node>
+</launch>
